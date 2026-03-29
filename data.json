@@ -70,7 +70,7 @@
   {
     "Category": "腸道感染",
     "Disease": "Cholera (霍亂)",
-    "Causative Agent": "<span style='color:red'>Vibrio cholerae</span> (Gram-negative, curved rod)",
+    "Causative Agent": "<span style='color:red'>Vibrio cholerae (Gram-negative, curved rod)</span>",
     "Transmission Route": "Fecal-oral (ingestion of contaminated water/food)",
     "Primary Symptoms": "Profuse <span style='color:red'>\"rice-water\" stools</span>, rapid dehydration, electrolyte imbalance",
     "Primary Treatment": "Rehydration",
@@ -91,9 +91,9 @@
     "Disease": "Gonorrhea (淋病)",
     "Causative Agent": "<span style='color:red'>Neisseria gonorrhoeae</span> (Gram-negative diplococci)",
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
-    "Primary Symptoms": "Purulent discharge (urethral/vaginal), dysuria; often asymptomatic in females",
+    "Primary Symptoms": "<span style='color:red'>**Purulent discharge**</span>(urethral/vaginal), dysuria; often asymptomatic in females",
     "Antibiotic Treatment": "<span style='color:red'>Ceftriaxone</span> and Doxycycline",
-    "Latency": "Absent"
+    "Latency": "<span style='color:red'>**Absent**</span>"
   },
   {
     "Category": "性傳染病",
@@ -102,18 +102,18 @@
     "Transmission Route": "Sexual contact; transplacental (congenital); blood transfusion",
     "Primary Symptoms (Stage 1)": "Painless chancre",
     "Primary Symptoms (Stage 2)": "Rash, lymphadenopathy",
-    "Primary Symptoms (Stage 3)": "Gummas, neurosyphilis",
+    "Primary Symptoms (Stage 3)": "<span style='color:red'>**Gummas**</span>, neurosyphilis",
     "Primary Antibiotic Treatment": "<span style='color:red'>Penicillin G</span> (parenteral)",
     "Penicillin-allergic Alternative": "Doxycycline or Tetracycline",
-    "Latency": "Present. Characterized by a \"Latent Stage\" (Early and Late) where the patient is asymptomatic but serologically positive."
+    "Latency": "<span style='color:red'>**Present.**</span> Characterized by a \"Latent Stage\" (Early and Late) where the patient is asymptomatic but serologically positive."
   },
   {
     "Category": "性傳染病",
     "Disease": "Chlamydiosis (披衣菌感染)",
     "Causative Agent": "<span style='color:red'>Chlamydia trachomatis</span> (Gram-negative, obligate intracellular bacterium)",
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
-    "Primary Symptoms": "Often asymptomatic; mucoid or purulent discharge, dysuria, pelvic inflammatory disease (PID)",
+    "Primary Symptoms": "Often asymptomatic; mucoid or purulent discharge, dysuria, <span style='color:red'>**pelvic inflammatory disease (PID)**</span>",
     "Antibiotic Treatment": "<span style='color:red'>Azithromycin</span> and Doxycycline",
-    "Latency": "Absent. However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
+    "Latency": "<span style='color:red'>**Absent.</span> However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
   }
 ]
