@@ -123,7 +123,7 @@ def generate_new_question(prefix, source_data=None):
 # 3. 側邊欄與版面配置
 # ==========================================
 st.sidebar.title("⚙️ 設定區")
-mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "卡片瀏覽模式","選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡", "🏆 個人計分板"])
+mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "卡片瀏覽模式","選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"])
 
 st.title("🦠 感染症記憶閃卡系統")
 st.markdown("---")
@@ -632,38 +632,5 @@ elif mode == "新增學習卡":
                 st.success(f"成功新增：{new_disease}！")
                 # 清除快取以載入新資料
                 st.cache_data.clear()
-# 🟢 個人計分板模式
-elif mode == "🏆 個人計分板":
-    st.subheader("🏆 個人戰力分析")
-    progress = st.session_state['user_progress']
-    
-    # 計算正確率
-    total = progress['total_answered']
-    correct = progress['total_correct']
-    accuracy = (correct / total * 100) if total > 0 else 0
-    
-    # 使用 metric 顯示漂亮的大數字
-    col1, col2, col3 = st.columns(3)
-    col1.metric("總答題數", f"{total} 題")
-    col2.metric("正確題數", f"{correct} 題")
-    col3.metric("整體正確率", f"{accuracy:.1f} %")
-    
-    st.markdown("---")
-    st.subheader("🎖️ 已解鎖成就")
-    if progress['achievements']:
-        for ach in progress['achievements']:
-            st.markdown(f"- 🌟 **{ach}**")
-    else:
-        st.info("目前還沒有解鎖成就，快去「選擇模式」或「模擬考」刷題吧！")
-        
-    st.markdown("---")
-    # 匯出資料的按鈕功能
-    st.write("📊 **資料匯出**")
-    csv_data = f"Total Answered,Total Correct,Accuracy\n{total},{correct},{accuracy:.1f}%\n"
-    st.download_button(
-        label="📥 下載進度 (CSV)",
-        data=csv_data,
-        file_name='my_study_progress.csv',
-        mime='text/csv',
-    )
+
 
