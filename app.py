@@ -3,6 +3,14 @@ import pandas as pd
 import json
 import random
 import re
+import re
+
+# 新增：極度寬鬆的比對過濾器 (只保留英數字並轉小寫)
+def clean_for_spelling(text):
+    # 先移除 HTML 的紅字標籤
+    text = remove_html_tags(text)
+    # 移除非英數字元 (包含空格、標點、括號與中文)
+    return re.sub(r'[^a-zA-Z0-9]', '', str(text)).lower()
 
 # ==========================================
 # 1. 資料載入與快取 (提升網頁載入速度)
@@ -41,10 +49,16 @@ def get_wrong_options(correct_answer, current_feature, num=3):
     # 回傳隨機挑選的指定數量錯誤選項
     return random.sample(wrong_values, min(num, len(wrong_values)))
 
-# 重新產生題目的狀態重置函式
-def generate_new_question(prefix):
-    target_item = random.choice(data)
-    available_features = [key for key in target_item.keys() if key != "Disease" and target_item[key]]
+# 重新產生題目的狀態重置函式 (加入 source_data 參數以支援分類題庫)
+def generate_new_question(prefix, source_data=None):
+    if source_data is None:
+        source_data = data
+        
+    target_item = random.choice(source_data)
+    
+    # 這裡的 if key not in ["Disease", "Category"] 確保程式不會問你這個疾病的名稱或分類
+    available_features = [key for key in target_item.keys() if key not in ["Disease", "Category"] and target_item.get(key)]
+    
     question_feature = random.choice(available_features)
     correct_answer = target_item[question_feature]
     
@@ -122,32 +136,47 @@ elif mode == "卡片瀏覽模式":
 elif mode == "選擇模式":
     st.subheader("🎯 選擇模式")
     
-    # 初始化 Session State
-    if 'mcq_item' not in st.session_state:
-        generate_new_question('mcq')
+    # 動態抓取目前所有的分類
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    
+    # 加入下拉式選單
+    selected_category = st.selectbox("請選擇要測驗的分類：", ["全部"] + all_categories, key="mcq_category_select")
+    
+    # 根據使用者的選擇過濾題庫
+    if selected_category != "全部":
+        filtered_data = [item for item in data if item.get("Category") == selected_category]
+    else:
+        filtered_data = data
         
-    st.markdown(f"請問 **{st.session_state['mcq_item']['Disease']}** 的 **{st.session_state['mcq_feature']}** 是什麼？")
-    
-    # 顯示選項
-    user_choice = st.radio("請選擇正確答案：", st.session_state['mcq_options'], index=None)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("送出答案"):
-            st.session_state['mcq_show_result'] = True
-    with col2:
-        if st.button("下一題"):
-            generate_new_question('mcq')
-            st.rerun()
-            
-    if st.session_state.get('mcq_show_result'):
-        correct_clean = remove_html_tags(st.session_state['mcq_answer'])
-        if user_choice == correct_clean:
-            st.success("✅ 答對了！")
-            st.markdown(f"**完整解析**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
-        else:
-            st.error("❌ 答錯了！")
-            st.markdown(f"**正確解答應為**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
+    # 如果是第一次進入，或是使用者切換了分類，就重新抽題
+    if 'mcq_current_category' not in st.session_state or st.session_state['mcq_current_category'] != selected_category:
+        st.session_state['mcq_current_category'] = selected_category
+        generate_new_question('mcq', filtered_data)
+        
+    # 確保 session_state 裡已經有題目才顯示
+    if 'mcq_item' in st.session_state:
+        st.markdown(f"請問 **{st.session_state['mcq_item']['Disease']}** 的 **{st.session_state['mcq_feature']}** 是什麼？")
+        
+        # 顯示選項
+        user_choice = st.radio("請選擇正確答案：", st.session_state['mcq_options'], index=None)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("送出答案"):
+                st.session_state['mcq_show_result'] = True
+        with col2:
+            if st.button("下一題"):
+                generate_new_question('mcq', filtered_data)
+                st.rerun()
+                
+        if st.session_state.get('mcq_show_result'):
+            correct_clean = remove_html_tags(st.session_state['mcq_answer'])
+            if user_choice == correct_clean:
+                st.success("✅ 答對了！")
+                st.markdown(f"**完整解析**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
+            else:
+                st.error("❌ 答錯了！")
+                st.markdown(f"**正確解答應為**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
 
 # 🟡 拼寫模式
 elif mode == "拼寫模式":
@@ -169,14 +198,13 @@ elif mode == "拼寫模式":
             generate_new_question('spell')
             st.rerun()
 
-    if st.session_state.get('spell_show_result'):
-        # 將輸入與答案都轉小寫、去頭尾空白、去 HTML 標籤後進行比對
-        correct_clean = remove_html_tags(st.session_state['spell_answer']).strip().lower()
-        input_clean = user_input.strip().lower()
-        
-        if input_clean == correct_clean:
-            st.success("✅ 完全正確！")
-            st.markdown(f"**原始解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
+    correct_clean = clean_for_spelling(st.session_state['spell_answer'])
+    input_clean = clean_for_spelling(user_input)
+
+    if input_clean == correct_clean and input_clean != "":
+        st.success("✅ 完全正確！")
+        st.markdown(f"**原始解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
+    
         elif input_clean in correct_clean and len(input_clean) > 3:
             st.warning("⚠️ 接近了！(包含部分關鍵字)")
             st.markdown(f"**完整解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
@@ -187,8 +215,86 @@ elif mode == "拼寫模式":
 # 🟣 全真模擬考模式
 elif mode == "全真模擬考模式":
     st.subheader("📝 全真模擬考 (計分模式)")
-    st.info("💡 提示：目前你已經完成了基本的三大模式！模擬考模式可以結合 Session State 來記錄題號 (1~10題) 與總分。")
-    st.write("如果你希望進一步開發這個模式，我們可以設定它連續出 10 題混合題型，並在最後一頁產生「錯誤訂正表」。")
+
+    # 1. 選擇考試範圍與題型
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    exam_category = st.selectbox("請選擇模擬考範圍：", ["全部"] + all_categories, key="exam_category")
+    exam_type = st.radio("請選擇測驗方式：", ["配合題 (下拉選單)", "填空題 (打字輸入)"], horizontal=True)
+
+    # 2. 準備過濾後的資料
+    if exam_category != "全部":
+        exam_data = [item for item in data if item.get("Category") == exam_category]
+    else:
+        exam_data = data
+
+    # 3. 產生考卷 (使用 Session State 鎖定題目，避免重新整理就換題)
+    if 'exam_questions' not in st.session_state or st.session_state.get('exam_current_cat') != exam_category or st.session_state.get('exam_current_type') != exam_type:
+        st.session_state['exam_current_cat'] = exam_category
+        st.session_state['exam_current_type'] = exam_type
+        st.session_state['exam_submitted'] = False
+
+        # 隨機挑出 5 題 (若該分類不足 5 題則全出)
+        num_questions = min(5, len(exam_data))
+        selected_items = random.sample(exam_data, num_questions)
+        questions = []
+        all_answers = [] # 用於配合題的選項庫
+
+        for item in selected_items:
+            available_features = [k for k in item.keys() if k not in ["Disease", "Category"] and item.get(k)]
+            feature = random.choice(available_features)
+            ans = item[feature]
+            questions.append({"disease": item["Disease"], "feature": feature, "answer": ans})
+            all_answers.append(remove_html_tags(ans)) # 將純文字答案加入選項庫
+
+        random.shuffle(all_answers)
+        st.session_state['exam_questions'] = questions
+        st.session_state['exam_answers_bank'] = all_answers
+
+    # 4. 顯示考卷表單
+    with st.form("exam_form"):
+        user_answers = []
+        for i, q in enumerate(st.session_state['exam_questions']):
+            st.markdown(f"**Q{i+1}: 請問 {q['disease']} 的 {q['feature']} 是什麼？**")
+
+            if "配合題" in exam_type:
+                ans = st.selectbox("選擇答案：", ["請選擇..."] + st.session_state['exam_answers_bank'], key=f"exam_q_{i}")
+                user_answers.append(ans)
+            else:
+                ans = st.text_input("輸入答案 (英文字母對即可)：", key=f"exam_q_{i}")
+                user_answers.append(ans)
+            st.divider()
+
+        submit_exam = st.form_submit_button("交卷看成績")
+
+    # 5. 批改邏輯與成績顯示
+    if submit_exam:
+        st.session_state['exam_submitted'] = True
+        score = 0
+        st.subheader("📊 考試結果與訂正")
+
+        for i, q in enumerate(st.session_state['exam_questions']):
+            correct_ans = q['answer']
+            user_ans = user_answers[i]
+
+            # 排除未作答的情況
+            if user_ans == "請選擇..." or user_ans.strip() == "":
+                st.error(f"Q{i+1}: ❌ 未作答。\n\n正確解答：{correct_ans}")
+                continue
+
+            # 寬鬆比對：只要英文字母一樣就給對
+            if clean_for_spelling(user_ans) == clean_for_spelling(correct_ans):
+                score += 1
+                st.success(f"Q{i+1}: ✅ 答對了！ ({remove_html_tags(correct_ans)})")
+            else:
+                st.error(f"Q{i+1}: ❌ 答錯了。\n\n正確解答：{correct_ans} \n\n你的作答：{user_ans}")
+
+        total_q = len(st.session_state['exam_questions'])
+        st.metric(label="總分", value=f"{int((score/total_q)*100)} 分", delta=f"{score} / {total_q} 題")
+
+        # 重新測驗按鈕
+        if st.button("再考一次"):
+            del st.session_state['exam_questions']
+            st.rerun()
 
 # 🟢 新增學習卡模式
 elif mode == "新增學習卡":
