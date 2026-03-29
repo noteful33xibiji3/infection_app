@@ -305,36 +305,46 @@ elif mode == "拼寫模式":
 # 🟣 全真模擬考模式
 elif mode == "全真模擬考模式":
     st.subheader("📝 全真模擬考 (計分模式)")
-
+    
     # 1. 選擇考試範圍與題型
-    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
-    exam_category = st.selectbox("請選擇模擬考範圍：", ["全部"] + all_categories, key="exam_category")
+    exam_category = st.selectbox("請選擇模擬考範圍：", ["全部 (考所有表格)"] + all_categories, key="exam_category")
     exam_type = st.radio("請選擇測驗方式：", ["配合題 (下拉選單)", "填空題 (打字輸入)"], horizontal=True)
 
-    # 2. 準備過濾後的資料
-    if exam_category != "全部":
+    # 準備過濾後的資料
+    if exam_category != "全部 (考所有表格)":
         exam_data = [item for item in data if item.get("Category") == exam_category]
     else:
         exam_data = data
 
-    # 3. 產生考卷 (使用 Session State 鎖定題目，避免重新整理就換題)
-    if 'exam_questions' not in st.session_state or st.session_state.get('exam_current_cat') != exam_category or st.session_state.get('exam_current_type') != exam_type:
+    # 2. 新增：讓使用者選擇題數
+    max_q = len(exam_data)
+    exam_count_option = st.radio("請選擇測驗題數：", [5, 10, "考全部！"], horizontal=True, key="exam_count_option")
+    
+    if exam_count_option == "考全部！":
+        num_questions = max_q
+    else:
+        num_questions = min(exam_count_option, max_q)
+
+    # 3. 產生考卷 (加入題數變化作為重新出題的判斷條件)
+    if 'exam_questions' not in st.session_state or \
+       st.session_state.get('exam_current_cat') != exam_category or \
+       st.session_state.get('exam_current_type') != exam_type or \
+       st.session_state.get('exam_current_count') != num_questions:
+        
         st.session_state['exam_current_cat'] = exam_category
         st.session_state['exam_current_type'] = exam_type
+        st.session_state['exam_current_count'] = num_questions
         st.session_state['exam_submitted'] = False
-
-        # 隨機挑出 5 題 (若該分類不足 5 題則全出)
-        num_questions = min(5, len(exam_data))
+        
         selected_items = random.sample(exam_data, num_questions)
-        questions = []
-        all_answers = [] # 用於配合題的選項庫
+        questions, all_answers = [], []
 
         for item in selected_items:
             available_features = [k for k in item.keys() if k not in ["Disease", "Category"] and item.get(k)]
             feature = random.choice(available_features)
             ans = item[feature]
             questions.append({"disease": item["Disease"], "feature": feature, "answer": ans})
-            all_answers.append(remove_html_tags(ans)) # 將純文字答案加入選項庫
+            all_answers.append(remove_html_tags(ans))
 
         random.shuffle(all_answers)
         st.session_state['exam_questions'] = questions
@@ -345,33 +355,33 @@ elif mode == "全真模擬考模式":
         user_answers = []
         for i, q in enumerate(st.session_state['exam_questions']):
             st.markdown(f"**Q{i+1}: 請問 {q['disease']} 的 {q['feature']} 是什麼？**")
-
+            
             if "配合題" in exam_type:
+                # 配合題使用下拉選單
                 ans = st.selectbox("選擇答案：", ["請選擇..."] + st.session_state['exam_answers_bank'], key=f"exam_q_{i}")
-                user_answers.append(ans)
             else:
+                # 填空題使用文字輸入框
                 ans = st.text_input("輸入答案 (英文字母對即可)：", key=f"exam_q_{i}")
-                user_answers.append(ans)
+                
+            user_answers.append(ans)
             st.divider()
 
         submit_exam = st.form_submit_button("交卷看成績")
 
-    # 5. 批改邏輯與成績顯示
+    # 5. 批改與成績計算
     if submit_exam:
         st.session_state['exam_submitted'] = True
         score = 0
         st.subheader("📊 考試結果與訂正")
-
+        
         for i, q in enumerate(st.session_state['exam_questions']):
             correct_ans = q['answer']
             user_ans = user_answers[i]
 
-            # 排除未作答的情況
             if user_ans == "請選擇..." or user_ans.strip() == "":
                 st.error(f"Q{i+1}: ❌ 未作答。\n\n正確解答：{correct_ans}")
                 continue
 
-            # 寬鬆比對：只要英文字母一樣就給對
             if clean_for_spelling(user_ans) == clean_for_spelling(correct_ans):
                 score += 1
                 st.success(f"Q{i+1}: ✅ 答對了！ ({remove_html_tags(correct_ans)})")
@@ -380,12 +390,17 @@ elif mode == "全真模擬考模式":
 
         total_q = len(st.session_state['exam_questions'])
         st.metric(label="總分", value=f"{int((score/total_q)*100)} 分", delta=f"{score} / {total_q} 題")
-
+        
+        # 紀錄分數到計分板
+        st.session_state['user_progress']['total_answered'] += total_q
+        st.session_state['user_progress']['total_correct'] += score
+        save_progress(st.session_state['user_progress'])
+        check_achievements()
+        
         # 重新測驗按鈕
         if st.button("再考一次"):
             del st.session_state['exam_questions']
             st.rerun()
-
 # 🟢 新增學習卡模式
 elif mode == "新增學習卡":
     st.subheader("➕ 新增學習卡")
