@@ -306,6 +306,9 @@ elif mode == "拼寫模式":
 elif mode == "全真模擬考模式":
     st.subheader("📝 全真模擬考 (計分模式)")
     
+    # 確保 all_categories 變數有被正確定義 (動態抓取目前所有的分類)
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    
     # 1. 選擇考試範圍與題型
     exam_category = st.selectbox("請選擇模擬考範圍：", ["全部 (考所有表格)"] + all_categories, key="exam_category")
     exam_type = st.radio("請選擇測驗方式：", ["配合題 (下拉選單)", "填空題 (打字輸入)"], horizontal=True)
