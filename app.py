@@ -139,6 +139,9 @@ if not data:
 if mode == "檢視全部模式":
     st.subheader("📋 完整比較表")
     
+    # 🌟 補上這行：動態抓取目前所有的分類，徹底解決 NameError
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    
     # 加入分類選單
     selected_category = st.selectbox("請選擇要檢視的分類：", ["全部"] + all_categories, key="view_all_cat")
     
