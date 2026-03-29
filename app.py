@@ -138,13 +138,25 @@ if not data:
 # 🟢 檢視全部模式
 if mode == "檢視全部模式":
     st.subheader("📋 完整比較表")
-    df = pd.DataFrame(data).fillna("")
-    # 將欄位名稱為 Disease 的移到第一欄
-    if 'Disease' in df.columns:
-        cols = ['Disease'] + [col for col in df.columns if col != 'Disease']
+    
+    # 加入分類選單
+    selected_category = st.selectbox("請選擇要檢視的分類：", ["全部"] + all_categories, key="view_all_cat")
+    
+    # 根據選單過濾資料
+    filtered_data = [item for item in data if item.get("Category") == selected_category] if selected_category != "全部" else data
+    
+    # 將過濾後的資料轉換為 DataFrame
+    df = pd.DataFrame(filtered_data).fillna("")
+    
+    # 排列欄位，讓 Disease 和 Category 固定在最前面，方便閱讀
+    if not df.empty and 'Disease' in df.columns:
+        cols = ['Disease']
+        if 'Category' in df.columns:
+            cols.append('Category')
+        cols += [col for col in df.columns if col not in ['Disease', 'Category']]
         df = df[cols]
+        
     st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
-
 # 卡片瀏覽邏輯
 elif mode == "卡片瀏覽模式":
     st.subheader("🗂️ 學習卡總覽")
