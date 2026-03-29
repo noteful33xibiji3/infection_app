@@ -54,7 +54,7 @@
     "Disease": "Typhus (斑疹傷寒)",
     "Causative Agent": "<span style='color:red'>Rickettsia prowazekii / typhi (Gram-negative Coccobacilli (pleomorphic))</span>",
     "Transmission Route": "<span style='color:red'>Arthropod vectors (Lice, Fleas)</span>",
-    "Primary Symptoms": "High fever, headache, cough,<span style='color:red'>**generalized rash**</span>",
+    "Primary Symptoms": "High fever, headache, cough,<span style='color:red'>** generalized rash **</span>",
     "Antibiotic Treatment": "<span style='color:red'>Doxycycline / Chloramphenicol</span>",
     "Prevention": "<span style='color:red'>Vector control (Lice/Flea management)</span>"
   },
@@ -63,7 +63,7 @@
     "Disease": "Typhoid Fever (傷寒)",
     "Causative Agent": "<span style='color:red'>Salmonella typhi (Gram-negative Rods (bacilli))</span>",
     "Transmission Route": "<span style='color:red'>Fecal-oral route (Contaminated food or water)</span>",
-    "Primary Symptoms": "Persistent high fever,<span style='color:red'>**severe abdominal pain, diarrhea/constipation, rose spots**</span>",
+    "Primary Symptoms": "Persistent high fever,<span style='color:red'>** severe abdominal pain, diarrhea/constipation, rose spots **</span>",
     "Antibiotic Treatment": "<span style='color:red'>Ciprofloxacin / Ceftriaxone</span>",
     "Prevention": "<span style='color:red'>Vaccination and food/water hygiene</span>"
   },
@@ -93,7 +93,7 @@
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
     "Primary Symptoms": "<span style='color:red'>**Purulent discharge**</span>(urethral/vaginal), dysuria; often asymptomatic in females",
     "Antibiotic Treatment": "<span style='color:red'>Ceftriaxone</span> and Doxycycline",
-    "Latency": "<span style='color:red'>**Absent**</span>"
+    "Latency": "<span style='color:red'>** Absent **</span>"
   },
   {
     "Category": "性傳染病",
@@ -105,7 +105,7 @@
     "Primary Symptoms (Stage 3)": "<span style='color:red'>**Gummas**</span>, neurosyphilis",
     "Primary Antibiotic Treatment": "<span style='color:red'>Penicillin G</span> (parenteral)",
     "Penicillin-allergic Alternative": "Doxycycline or Tetracycline",
-    "Latency": "<span style='color:red'>**Present.**</span> Characterized by a \"Latent Stage\" (Early and Late) where the patient is asymptomatic but serologically positive."
+    "Latency": "<span style='color:red'>** Present. **</span> Characterized by a \"Latent Stage\" (Early and Late) where the patient is asymptomatic but serologically positive."
   },
   {
     "Category": "性傳染病",
@@ -114,6 +114,6 @@
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
     "Primary Symptoms": "Often asymptomatic; mucoid or purulent discharge, dysuria, <span style='color:red'>**pelvic inflammatory disease (PID)**</span>",
     "Antibiotic Treatment": "<span style='color:red'>Azithromycin</span> and Doxycycline",
-    "Latency": "<span style='color:red'>**Absent.**</span> However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
+    "Latency": "<span style='color:red'>** Absent. **</span> However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
   }
 ]
