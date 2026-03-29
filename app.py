@@ -63,7 +63,7 @@ def generate_new_question(prefix):
 # 3. 側邊欄與版面配置
 # ==========================================
 st.sidebar.title("⚙️ 設定區")
-mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"])
+mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "卡片瀏覽模式","選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"])
 
 st.title("🦠 感染症記憶閃卡系統")
 st.markdown("---")
@@ -84,6 +84,39 @@ if mode == "檢視全部模式":
         cols = ['Disease'] + [col for col in df.columns if col != 'Disease']
         df = df[cols]
     st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
+
+# 卡片瀏覽邏輯
+elif mode == "卡片瀏覽模式":
+    st.subheader("🗂️ 學習卡總覽")
+    
+    # 動態抓取目前所有的分類 (排除沒有分類的項目)
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    
+    # 建立下拉式選單讓使用者選擇分類
+    selected_category = st.selectbox("請選擇要複習的單元：", ["全部"] + all_categories)
+    
+    st.markdown("---")
+    
+    # 根據選擇過濾資料
+    if selected_category != "全部":
+        filtered_data = [item for item in data if item.get("Category") == selected_category]
+    else:
+        filtered_data = data
+        
+    # 使用 st.columns 建立雙欄網格排列，讓畫面像鋪滿卡片一樣
+    cols = st.columns(2)
+    for i, item in enumerate(filtered_data):
+        with cols[i % 2]:
+            # 使用 container 加上邊框，模擬實體卡片的視覺效果
+            with st.container(border=True):
+                st.markdown(f"### {item.get('Disease', '未知疾病')}")
+                st.caption(f"📂 分類：{item.get('Category', '未分類')}")
+                st.divider() # 畫一條分隔線
+                
+                # 迴圈印出該疾病的所有特徵
+                for key, value in item.items():
+                    if key not in ["Disease", "Category"]:
+                        st.markdown(f"**{key}**: {value}", unsafe_allow_html=True)
 
 # 🔵 選擇模式
 elif mode == "選擇模式":
