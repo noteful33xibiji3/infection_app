@@ -24,7 +24,7 @@
     "Disease": "Enterotoxin (腸毒素)",
     "Origin": "A functional subset of exotoxins",
     "Bacterial Source": "Specific to intestinal pathogens",
-    "Chemical Nature": "span style='color:red'>Protein (polypeptide)</span> ",
+    "Chemical Nature": "<span style='color:red'>Protein (polypeptide)</span> ",
     "Heat Stability": "Varies (often heat-stable)",
     "Target Organ": "Specifically intestinal mucosa",
     "Immunogenicity": "<span style='color:red'>Strong (highly immunogenic)</span> "
@@ -114,6 +114,6 @@
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
     "Primary Symptoms": "Often asymptomatic; mucoid or purulent discharge, dysuria, <span style='color:red'>**pelvic inflammatory disease (PID)**</span>",
     "Antibiotic Treatment": "<span style='color:red'>Azithromycin</span> and Doxycycline",
-    "Latency": "<span style='color:red'>**Absent.</span> However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
+    "Latency": "<span style='color:red'>**Absent.**</span> However, it can remain \"subclinical\" or asymptomatic for long periods without being a true latent infection."
   }
 ]
