@@ -3,69 +3,69 @@
     "Category": "毒素比較",
     "Disease": "Endotoxin (內毒素)",
     "Origin": "Part of the outer membrane (Lipopolysaccharide, LPS)",
-    "Bacterial Source": "<span style='color:red'>Gram-negative</span> bacteria",
-    "Chemical Nature": "Lipid A component of LPS",
-    "Heat Stability": "<span style='color:red'>High (stable at 100°C)</span>",
-    "Target Organ": "Systemic (induces fever, shock)",
-    "Immunogenicity": "Weak (poor antigen)"
+    "Bacterial Source": "Gram-negative bacteria",
+    "Chemical Nature": "<span style='color:red'>Lipid A component of LPS</span>",
+    "Heat Stability": "High (stable at 100°C)",
+    "Target Organ": "<span style='color:red'>Systemic (induces fever, shock)</span> ",
+    "Immunogenicity": "<span style='color:red'>Weak (poor antigen)</span>"
   },
   {
     "Category": "毒素比較",
     "Disease": "Exotoxin (外毒素)",
     "Origin": "Secreted by living bacteria",
-    "Bacterial Source": "Mostly <span style='color:red'>Gram-positive</span> (some G-)",
-    "Chemical Nature": "Protein (polypeptide)",
+    "Bacterial Source": "Mostly Gram-positive(some G-)",
+    "Chemical Nature": "<span style='color:red'>Protein (polypeptide)</span>",
     "Heat Stability": "Low (usually heat-labile)",
     "Target Organ": "Specific cell types/tissues",
-    "Immunogenicity": "<span style='color:red'>Strong</span> (good antigen, toxoids)"
+    "Immunogenicity": "<span style='color:red'>Strong (good antigen, toxoids)</span>"
   },
   {
     "Category": "毒素比較",
     "Disease": "Enterotoxin (腸毒素)",
     "Origin": "A functional subset of exotoxins",
     "Bacterial Source": "Specific to intestinal pathogens",
-    "Chemical Nature": "Protein (polypeptide)",
+    "Chemical Nature": "span style='color:red'>Protein (polypeptide)</span> ",
     "Heat Stability": "Varies (often heat-stable)",
     "Target Organ": "Specifically intestinal mucosa",
-    "Immunogenicity": "<span style='color:red'>Strong</span> (highly immunogenic)"
+    "Immunogenicity": "<span style='color:red'>Strong (highly immunogenic)</span> "
   },
   {
     "Category": "皮膚感染",
     "Disease": "Erysipelas (丹毒)",
-    "Causative Agent": "<span style='color:red'>Streptococcus pyogenes</span> (Group A Streptococcus)",
-    "Primary Source of Infection": "Skin wounds, Tinea pedis (athlete's foot), upper respiratory tract infections",
-    "Predilection Sites": "Lower extremities, Face (下肢;臉部)",
-    "Erythema Characteristics": "Bright red; sharply demarcated and elevated borders",
-    "Systemic Symptoms": "Often presents with fever, malaise, and chills (Severe acute bacterial cellulitis)",
-    "Antibiotic Treatment": "Penicillin"
+    "Causative Agent": "<span style='color:red'>Streptococcus pyogenes (Group A Streptococcus)</span>",
+    "Primary Source of Infection": "<span style='color:red'>Skin wounds, Tinea pedis (athlete's foot), upper respiratory tract infections</span>",
+    "Predilection Sites": "<span style='color:red'>Lower extremities, Face (下肢;臉部)</span>",
+    "Erythema Characteristics": "<span style='color:red'>Bright red;</span> sharply demarcated and elevated borders",
+    "Systemic Symptoms": "<span style='color:red'>Often presents with fever, malaise, and chills (Severe acute bacterial cellulitis)</span>",
+    "Antibiotic Treatment": "<span style='color:red'>Penicillin</span>"
   },
   {
     "Category": "皮膚感染",
     "Disease": "Erysipeloid (類丹毒)",
-    "Causative Agent": "<span style='color:red'>Erysipelothrix rhusiopathiae</span> (Gram-positive pleomorphic rods)",
-    "Primary Source of Infection": "Contact with infected fish, swine, or meat (Occupational disease)",
-    "Predilection Sites": "Fingers, Dorsum of the hand (手指;手背)",
-    "Erythema Characteristics": "Dull red or purplish; distinct borders but not typically elevated",
-    "Systemic Symptoms": "Usually no systemic symptoms; localized to the site of infection(burn and itch)",
-    "Antibiotic Treatment": "Penicillin / Erythromycin"
+    "Causative Agent": "<span style='color:red'>Erysipelothrix rhusiopathiae (Gram-positive pleomorphic rods)</span>",
+    "Primary Source of Infection": "<span style='color:red'>Contact with infected fish, swine, or meat (Occupational disease)</span>",
+    "Predilection Sites": "<span style='color:red'>Fingers, Dorsum of the hand (手指;手背)</span>",
+    "Erythema Characteristics": "<span style='color:red'>Dull red or purplish;</span> distinct borders but not typically elevated",
+    "Systemic Symptoms": "<span style='color:red'>Usually no systemic symptoms; localized to the site of infection(burn and itch)</span>",
+    "Antibiotic Treatment": "<span style='color:red'>Penicillin / Erythromycin</span>"
   },
   {
     "Category": "傷寒類疾病",
     "Disease": "Typhus (斑疹傷寒)",
-    "Causative Agent": "<span style='color:red'>Rickettsia prowazekii / typhi</span> (Gram-negative Coccobacilli (pleomorphic))",
-    "Transmission Route": "Arthropod vectors (Lice, Fleas)",
-    "Primary Symptoms": "High fever, headache, cough, generalized rash",
-    "Antibiotic Treatment": "Doxycycline / Chloramphenicol",
-    "Prevention": "Vector control (Lice/Flea management)"
+    "Causative Agent": "<span style='color:red'>Rickettsia prowazekii / typhi (Gram-negative Coccobacilli (pleomorphic))</span>",
+    "Transmission Route": "<span style='color:red'>Arthropod vectors (Lice, Fleas)</span>",
+    "Primary Symptoms": "High fever, headache, cough, <span style='color:red'>**generalized rash**</span>",
+    "Antibiotic Treatment": "<span style='color:red'>Doxycycline / Chloramphenicol</span>",
+    "Prevention": "<span style='color:red'>Vector control (Lice/Flea management)</span>"
   },
   {
     "Category": "傷寒類疾病",
     "Disease": "Typhoid Fever (傷寒)",
-    "Causative Agent": "<span style='color:red'>Salmonella typhi</span> (Gram-negative Rods (bacilli))",
-    "Transmission Route": "Fecal-oral route (Contaminated food or water)",
-    "Primary Symptoms": "Persistent high fever, severe abdominal pain, diarrhea/constipation, <span style='color:red'>rose spots</span>",
+    "Causative Agent": "<span style='color:red'>Salmonella typhi (Gram-negative Rods (bacilli))</span>",
+    "Transmission Route": "<span style='color:red'>Fecal-oral route (Contaminated food or water)</span>",
+    "Primary Symptoms": "Persistent high fever,<span style='color:red'>**severe abdominal pain, diarrhea/constipation, rose spots**</span>",
     "Antibiotic Treatment": "<span style='color:red'>Ciprofloxacin / Ceftriaxone</span>",
-    "Prevention": "Vaccination and food/water hygiene"
+    "Prevention": "<span style='color:red'>Vaccination and food/water hygiene</span>"
   },
   {
     "Category": "腸道感染",
