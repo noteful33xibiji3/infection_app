@@ -50,6 +50,7 @@ def save_progress(progress_data):
 if 'user_progress' not in st.session_state:
     st.session_state['user_progress'] = load_progress()
 
+
 # 檢查成就解鎖的輔助函式
 def check_achievements():
     progress = st.session_state['user_progress']
