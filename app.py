@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import random
 import re
-import re
+import os
 
 # 新增：極度寬鬆的比對過濾器 (只保留英數字並轉小寫)
 def clean_for_spelling(text):
@@ -25,7 +25,50 @@ def load_data():
         return []
 
 data = load_data()
+# ==========================================
+# 1.5 進度與成就系統載入
+# ==========================================
+PROGRESS_FILE = 'progress.json'
 
+def load_progress():
+    if os.path.exists(PROGRESS_FILE):
+        with open(PROGRESS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    else:
+        # 初始成績單
+        return {
+            "total_answered": 0,
+            "total_correct": 0,
+            "achievements": []
+        }
+
+def save_progress(progress_data):
+    with open(PROGRESS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(progress_data, f, ensure_ascii=False, indent=2)
+
+# 載入進度到 Session State，方便全域呼叫
+if 'user_progress' not in st.session_state:
+    st.session_state['user_progress'] = load_progress()
+
+# 檢查成就解鎖的輔助函式
+def check_achievements():
+    progress = st.session_state['user_progress']
+    achievements = progress["achievements"]
+    new_unlock = None
+    
+    # 設定成就條件與稱號
+    if progress["total_correct"] >= 10 and "初出茅廬 (答對 10 題)" not in achievements:
+        new_unlock = "初出茅廬 (答對 10 題)"
+    elif progress["total_correct"] >= 50 and "藥理小神童 (答對 50 題)" not in achievements:
+        new_unlock = "藥理小神童 (答對 50 題)"
+    elif progress["total_correct"] >= 100 and "中西醫雙修學霸 (答對 100 題)" not in achievements:
+        new_unlock = "中西醫雙修學霸 (答對 100 題)"
+        
+    if new_unlock:
+        progress["achievements"].append(new_unlock)
+        save_progress(progress)
+        st.balloons() # 觸發 Streamlit 內建的慶祝氣球特效！
+        st.success(f"🏆 恭喜解鎖新成就：{new_unlock}！")
 # ==========================================
 # 2. 輔助函式
 # ==========================================
@@ -50,13 +93,14 @@ def get_wrong_options(correct_answer, current_feature, num=3):
     return random.sample(wrong_values, min(num, len(wrong_values)))
 
 # 重新產生題目的狀態重置函式 (加入 source_data 參數以支援分類題庫)
+# 重新產生題目的狀態重置函式 (支援分類與計分系統)
 def generate_new_question(prefix, source_data=None):
     if source_data is None:
         source_data = data
         
     target_item = random.choice(source_data)
     
-    # 這裡的 if key not in ["Disease", "Category"] 確保程式不會問你這個疾病的名稱或分類
+    # 排除 Disease 和 Category 作為考題
     available_features = [key for key in target_item.keys() if key not in ["Disease", "Category"] and target_item.get(key)]
     
     question_feature = random.choice(available_features)
@@ -67,17 +111,19 @@ def generate_new_question(prefix, source_data=None):
     st.session_state[f'{prefix}_answer'] = correct_answer
     st.session_state[f'{prefix}_show_result'] = False
     
+    # === 關鍵：換題時，把「已計分」的標記清除 ===
+    st.session_state.pop(f'{prefix}_scored', None)
+    
     if prefix == 'mcq':
         wrong_options = get_wrong_options(correct_answer, question_feature)
         all_options = wrong_options + [remove_html_tags(correct_answer)]
         random.shuffle(all_options)
         st.session_state['mcq_options'] = all_options
-
 # ==========================================
 # 3. 側邊欄與版面配置
 # ==========================================
 st.sidebar.title("⚙️ 設定區")
-mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "卡片瀏覽模式","選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"])
+mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "卡片瀏覽模式","選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"], "🏆 個人計分板")
 
 st.title("🦠 感染症記憶閃卡系統")
 st.markdown("---")
@@ -171,6 +217,16 @@ elif mode == "選擇模式":
                 
         if st.session_state.get('mcq_show_result'):
             correct_clean = remove_html_tags(st.session_state['mcq_answer'])
+            
+            # 確保同一題不會被重複計分
+            if 'mcq_scored' not in st.session_state:
+                st.session_state['user_progress']['total_answered'] += 1
+                if user_choice == correct_clean:
+                    st.session_state['user_progress']['total_correct'] += 1
+                save_progress(st.session_state['user_progress'])
+                st.session_state['mcq_scored'] = True # 標記已計分
+                check_achievements() # 檢查是否解鎖成就
+
             if user_choice == correct_clean:
                 st.success("✅ 答對了！")
                 st.markdown(f"**完整解析**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
@@ -182,36 +238,58 @@ elif mode == "選擇模式":
 elif mode == "拼寫模式":
     st.subheader("✍️ 拼寫模式 (注意拼字)")
     
-    if 'spell_item' not in st.session_state:
-        generate_new_question('spell')
+    # 動態抓取分類並建立選單
+    all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    selected_category = st.selectbox("請選擇要測驗的分類：", ["全部"] + all_categories, key="spell_category_select")
+    
+    if selected_category != "全部":
+        filtered_data = [item for item in data if item.get("Category") == selected_category]
+    else:
+        filtered_data = data
         
-    st.markdown(f"請輸入 **{st.session_state['spell_item']['Disease']}** 的 **{st.session_state['spell_feature']}**：")
-    
-    user_input = st.text_input("你的答案：", key="spell_input")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("檢查答案"):
-            st.session_state['spell_show_result'] = True
-    with col2:
-        if st.button("換下一題"):
-            generate_new_question('spell')
-            st.rerun()
+    # 初始化或切換分類時重新抽題
+    if 'spell_current_category' not in st.session_state or st.session_state['spell_current_category'] != selected_category:
+        st.session_state['spell_current_category'] = selected_category
+        generate_new_question('spell', filtered_data)
+        
+    if 'spell_item' in st.session_state:
+        st.markdown(f"請輸入 **{st.session_state['spell_item']['Disease']}** 的 **{st.session_state['spell_feature']}**：")
+        
+        user_input = st.text_input("你的答案：", key="spell_input")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("檢查答案"):
+                st.session_state['spell_show_result'] = True
+        with col2:
+            if st.button("換下一題"):
+                generate_new_question('spell', filtered_data)
+                st.rerun()
 
-    correct_clean = clean_for_spelling(st.session_state['spell_answer'])
-    input_clean = clean_for_spelling(user_input)
+        if st.session_state.get('spell_show_result'):
+            # 使用寬鬆過濾器
+            correct_clean = clean_for_spelling(st.session_state['spell_answer'])
+            input_clean = clean_for_spelling(user_input)
+            
+            # === 計分系統整合 ===
+            if 'spell_scored' not in st.session_state:
+                st.session_state['user_progress']['total_answered'] += 1
+                if input_clean == correct_clean and input_clean != "":
+                    st.session_state['user_progress']['total_correct'] += 1
+                save_progress(st.session_state['user_progress'])
+                st.session_state['spell_scored'] = True
+                check_achievements()
 
-    if input_clean == correct_clean and input_clean != "":
-        st.success("✅ 完全正確！")
-        st.markdown(f"**原始解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
-    
-        elif input_clean in correct_clean and len(input_clean) > 3:
-            st.warning("⚠️ 接近了！(包含部分關鍵字)")
-            st.markdown(f"**完整解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
-        else:
-            st.error("❌ 錯誤！")
-            st.markdown(f"**正確解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
-
+            # === 判斷對錯與提示 ===
+            if input_clean == correct_clean and input_clean != "":
+                st.success("✅ 完全正確！")
+                st.markdown(f"**原始解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
+            elif input_clean in correct_clean and len(input_clean) > 3:
+                st.warning("⚠️ 接近了！(包含部分關鍵字)")
+                st.markdown(f"**完整解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
+            else:
+                st.error("❌ 錯誤！")
+                st.markdown(f"**正確解答**：{st.session_state['spell_answer']}", unsafe_allow_html=True)
 # 🟣 全真模擬考模式
 elif mode == "全真模擬考模式":
     st.subheader("📝 全真模擬考 (計分模式)")
@@ -331,5 +409,38 @@ elif mode == "新增學習卡":
                 st.success(f"成功新增：{new_disease}！")
                 # 清除快取以載入新資料
                 st.cache_data.clear()
-
+# 🟢 個人計分板模式
+elif mode == "🏆 個人計分板":
+    st.subheader("🏆 個人戰力分析")
+    progress = st.session_state['user_progress']
+    
+    # 計算正確率
+    total = progress['total_answered']
+    correct = progress['total_correct']
+    accuracy = (correct / total * 100) if total > 0 else 0
+    
+    # 使用 metric 顯示漂亮的大數字
+    col1, col2, col3 = st.columns(3)
+    col1.metric("總答題數", f"{total} 題")
+    col2.metric("正確題數", f"{correct} 題")
+    col3.metric("整體正確率", f"{accuracy:.1f} %")
+    
+    st.markdown("---")
+    st.subheader("🎖️ 已解鎖成就")
+    if progress['achievements']:
+        for ach in progress['achievements']:
+            st.markdown(f"- 🌟 **{ach}**")
+    else:
+        st.info("目前還沒有解鎖成就，快去「選擇模式」或「模擬考」刷題吧！")
+        
+    st.markdown("---")
+    # 匯出資料的按鈕功能
+    st.write("📊 **資料匯出**")
+    csv_data = f"Total Answered,Total Correct,Accuracy\n{total},{correct},{accuracy:.1f}%\n"
+    st.download_button(
+        label="📥 下載進度 (CSV)",
+        data=csv_data,
+        file_name='my_study_progress.csv',
+        mime='text/csv',
+    )
 
