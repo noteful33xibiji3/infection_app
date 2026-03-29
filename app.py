@@ -136,30 +136,43 @@ if not data:
 # 4. 各模式邏輯實作
 # ==========================================
 
-# 🟢 檢視全部模式
+# 🟢 檢視全部模式 (終極整合版：支援分類篩選、自動排序與粗體轉換)
 if mode == "檢視全部模式":
     st.subheader("📋 完整比較表")
     
-    # 🌟 補上這行：動態抓取目前所有的分類，徹底解決 NameError
+    # 1. 動態抓取目前所有的分類 (解決可能發生的 NameError)
     all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
     
-    # 加入分類選單
+    # 2. 加入分類選單
     selected_category = st.selectbox("請選擇要檢視的分類：", ["全部"] + all_categories, key="view_all_cat")
     
-    # 根據選單過濾資料
+    # 3. 根據選單過濾資料
     filtered_data = [item for item in data if item.get("Category") == selected_category] if selected_category != "全部" else data
     
-    # 將過濾後的資料轉換為 DataFrame
+    # 4. 定義將 Markdown 粗體 (**text**) 轉換為 HTML 粗體 (<b>text</b>) 的功能
+    def render_markdown_in_table(text):
+        # 把 **文字** 替換成 <b>文字</b>，讓 HTML 表格能辨識
+        return re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', str(text))
+
+    # 5. 處理 DataFrame
     df = pd.DataFrame(filtered_data).fillna("")
     
-    # 排列欄位，讓 Disease 和 Category 固定在最前面，方便閱讀
-    if not df.empty and 'Disease' in df.columns:
-        cols = ['Disease']
+    if not df.empty:
+        # 🌟 對表格內所有格子執行粗體標籤替換
+        df = df.applymap(render_markdown_in_table)
+        
+        # 🌟 排列欄位，確保 Disease 和 Category 固定在最前面，其餘欄位隨後
+        cols = []
+        if 'Disease' in df.columns:
+            cols.append('Disease')
         if 'Category' in df.columns:
             cols.append('Category')
-        cols += [col for col in df.columns if col not in ['Disease', 'Category']]
+            
+        remaining_cols = [col for col in df.columns if col not in ['Disease', 'Category']]
+        cols.extend(remaining_cols)
         df = df[cols]
         
+    # 6. 使用 HTML 渲染表格 (escape=False 才能顯示顏色與粗體)
     st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
 # 卡片瀏覽邏輯
 elif mode == "卡片瀏覽模式":
