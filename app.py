@@ -63,7 +63,7 @@ def generate_new_question(prefix):
 # 3. 側邊欄與版面配置
 # ==========================================
 st.sidebar.title("⚙️ 設定區")
-mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "選擇模式", "拼寫模式", "全真模擬考模式"])
+mode = st.sidebar.radio("選擇測驗模式", ["檢視全部模式", "選擇模式", "拼寫模式", "全真模擬考模式", "新增學習卡"])
 
 st.title("🦠 感染症記憶閃卡系統")
 st.markdown("---")
@@ -156,3 +156,41 @@ elif mode == "全真模擬考模式":
     st.subheader("📝 全真模擬考 (計分模式)")
     st.info("💡 提示：目前你已經完成了基本的三大模式！模擬考模式可以結合 Session State 來記錄題號 (1~10題) 與總分。")
     st.write("如果你希望進一步開發這個模式，我們可以設定它連續出 10 題混合題型，並在最後一頁產生「錯誤訂正表」。")
+
+# 🟢 新增學習卡模式
+elif mode == "新增學習卡":
+    st.subheader("➕ 新增學習卡")
+    st.write("在這裡輸入新的疾病與特徵，擴充你的題庫！")
+
+    # 使用表單來收集輸入
+    with st.form("add_card_form"):
+        new_disease = st.text_input("疾病名稱 (必填，例如：Tuberculosis (結核病))")
+        new_agent = st.text_input("致病菌 (Causative Agent)")
+        new_treatment = st.text_input("抗生素治療 (Antibiotic Treatment)")
+        new_symptoms = st.text_area("主要症狀 (Primary Symptoms)")
+
+        # 提交按鈕
+        submitted = st.form_submit_button("新增至題庫")
+
+        if submitted:
+            if new_disease.strip() == "":
+                st.error("疾病名稱不能為空！")
+            else:
+                # 建立新的字典，只加入有填寫的欄位
+                new_entry = {"Disease": new_disease}
+                if new_agent: new_entry["Causative Agent"] = new_agent
+                if new_treatment: new_entry["Antibiotic Treatment"] = new_treatment
+                if new_symptoms: new_entry["Primary Symptoms"] = new_symptoms
+
+                # 將新資料加入原本的 list
+                data.append(new_entry)
+
+                # 將更新後的資料寫回 JSON 檔案
+                with open('data.json', 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+
+                st.success(f"成功新增：{new_disease}！")
+                # 清除快取以載入新資料
+                st.cache_data.clear()
+
+
