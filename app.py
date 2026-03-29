@@ -193,32 +193,76 @@ elif mode == "卡片瀏覽模式":
                     if key not in ["Disease", "Category"]:
                         st.markdown(f"**{key}**: {value}", unsafe_allow_html=True)
 
-# 🔵 選擇模式
+# 🔵 選擇模式 (升級版：雙重篩選、不重複輪迴、紅字優先)
 elif mode == "選擇模式":
     st.subheader("🎯 選擇模式")
     
-    # 動態抓取目前所有的分類
+    # 1. 第一層篩選：分類
     all_categories = sorted(list(set([item.get("Category", "未分類") for item in data])))
+    selected_category = st.selectbox("請選擇要測驗的分類：", ["全部"] + all_categories, key="mcq_cat")
+    filtered_data = [item for item in data if item.get("Category") == selected_category] if selected_category != "全部" else data
     
-    # 加入下拉式選單
-    selected_category = st.selectbox("請選擇要測驗的分類：", ["全部"] + all_categories, key="mcq_category_select")
-    
-    # 根據使用者的選擇過濾題庫
-    if selected_category != "全部":
-        filtered_data = [item for item in data if item.get("Category") == selected_category]
-    else:
-        filtered_data = data
+    # 2. 第二層篩選：動態抓取該分類下的所有「特徵/類別」
+    all_features = set()
+    for item in filtered_data:
+        for k in item.keys():
+            if k not in ["Disease", "Category"] and item.get(k):
+                all_features.add(k)
+    selected_feature = st.selectbox("請選擇要測驗的考點類別：", ["全部 (隨機混考)"] + sorted(list(all_features)), key="mcq_feat")
+
+    # 3. 牌組初始化與重置邏輯 (當切換分類或特徵時)
+    if ('mcq_deck' not in st.session_state or 
+        st.session_state.get('mcq_current_category') != selected_category or 
+        st.session_state.get('mcq_current_feature') != selected_feature):
         
-    # 如果是第一次進入，或是使用者切換了分類，就重新抽題
-    if 'mcq_current_category' not in st.session_state or st.session_state['mcq_current_category'] != selected_category:
         st.session_state['mcq_current_category'] = selected_category
-        generate_new_question('mcq', filtered_data)
-        
-    # 確保 session_state 裡已經有題目才顯示
-    if 'mcq_item' in st.session_state:
+        st.session_state['mcq_current_feature'] = selected_feature
+        st.session_state['mcq_deck'] = [] # 清空牌組，迫使下方重新洗牌
+
+    # 4. 洗牌邏輯：牌組空了就重新把所有符合的題目裝進去
+    if len(st.session_state.get('mcq_deck', [])) == 0:
+        new_deck = []
+        for item in filtered_data:
+            for k, v in item.items():
+                if k not in ["Disease", "Category"] and v:
+                    if selected_feature == "全部 (隨機混考)" or k == selected_feature:
+                        new_deck.append({"item": item, "feature": k, "answer": v})
+
+        if not new_deck:
+            st.warning("此篩選條件下沒有題目！")
+        else:
+            # 🌟 優先考紅字：將題目分為「有紅字」與「無紅字」兩疊
+            red_deck = [q for q in new_deck if "<span style='color:red'>" in str(q["answer"])]
+            normal_deck = [q for q in new_deck if "<span style='color:red'>" not in str(q["answer"])]
+            
+            # 各自打亂後，把紅字牌疊放在最上面
+            random.shuffle(red_deck)
+            random.shuffle(normal_deck)
+            st.session_state['mcq_deck'] = red_deck + normal_deck
+            st.toast(f"🔄 題庫已重新洗牌！共 {len(st.session_state['mcq_deck'])} 題 (包含 {len(red_deck)} 題紅字優先考點)。")
+
+    # 5. 抽題與顯示邏輯
+    if 'mcq_deck' in st.session_state and len(st.session_state['mcq_deck']) > 0:
+        # 如果當前沒有題目 (第一次進來，或按了下一題被清除)
+        if 'mcq_item' not in st.session_state:
+            current_q = st.session_state['mcq_deck'].pop(0) # 從牌堆頂端抽一張
+            st.session_state['mcq_item'] = current_q["item"]
+            st.session_state['mcq_feature'] = current_q["feature"]
+            st.session_state['mcq_answer'] = current_q["answer"]
+            st.session_state['mcq_show_result'] = False
+            st.session_state.pop('mcq_scored', None)
+            
+            # 產生選項
+            wrong_options = get_wrong_options(current_q["answer"], current_q["feature"])
+            all_options = wrong_options + [remove_html_tags(current_q["answer"])]
+            random.shuffle(all_options)
+            st.session_state['mcq_options'] = all_options
+
+        # UI 顯示
+        remain_count = len(st.session_state['mcq_deck'])
+        st.caption(f"📦 題庫剩餘未考題數：{remain_count} 題 (考完將自動重新洗牌)")
         st.markdown(f"請問 **{st.session_state['mcq_item']['Disease']}** 的 **{st.session_state['mcq_feature']}** 是什麼？")
         
-        # 顯示選項
         user_choice = st.radio("請選擇正確答案：", st.session_state['mcq_options'], index=None)
         
         col1, col2 = st.columns(2)
@@ -227,27 +271,26 @@ elif mode == "選擇模式":
                 st.session_state['mcq_show_result'] = True
         with col2:
             if st.button("下一題"):
-                generate_new_question('mcq', filtered_data)
+                # 刪除當前題目，讓系統下一秒自動觸發重新抽題
+                del st.session_state['mcq_item']
                 st.rerun()
                 
         if st.session_state.get('mcq_show_result'):
             correct_clean = remove_html_tags(st.session_state['mcq_answer'])
             
-            # 確保同一題不會被重複計分
             if 'mcq_scored' not in st.session_state:
                 st.session_state['user_progress']['total_answered'] += 1
                 if user_choice == correct_clean:
                     st.session_state['user_progress']['total_correct'] += 1
                 save_progress(st.session_state['user_progress'])
-                st.session_state['mcq_scored'] = True # 標記已計分
-                check_achievements() # 檢查是否解鎖成就
+                st.session_state['mcq_scored'] = True
+                check_achievements()
 
             if user_choice == correct_clean:
                 st.success("✅ 答對了！")
-                st.markdown(f"**完整解析**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
             else:
                 st.error("❌ 答錯了！")
-                st.markdown(f"**正確解答應為**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
+            st.markdown(f"**完整解析**：{st.session_state['mcq_answer']}", unsafe_allow_html=True)
 
 # 🟡 拼寫模式
 elif mode == "拼寫模式":
