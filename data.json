@@ -1,5 +1,6 @@
 [
   {
+    "Category": "毒素比較",
     "Disease": "Endotoxin (內毒素)",
     "Origin": "Part of the outer membrane (Lipopolysaccharide, LPS)",
     "Bacterial Source": "<span style='color:red'>Gram-negative</span> bacteria",
@@ -9,6 +10,7 @@
     "Immunogenicity": "Weak (poor antigen)"
   },
   {
+    "Category": "毒素比較",
     "Disease": "Exotoxin (外毒素)",
     "Origin": "Secreted by living bacteria",
     "Bacterial Source": "Mostly <span style='color:red'>Gram-positive</span> (some G-)",
@@ -18,6 +20,7 @@
     "Immunogenicity": "<span style='color:red'>Strong</span> (good antigen, toxoids)"
   },
   {
+    "Category": "毒素比較",
     "Disease": "Enterotoxin (腸毒素)",
     "Origin": "A functional subset of exotoxins",
     "Bacterial Source": "Specific to intestinal pathogens",
@@ -27,6 +30,7 @@
     "Immunogenicity": "<span style='color:red'>Strong</span> (highly immunogenic)"
   },
   {
+    "Category": "皮膚感染",
     "Disease": "Erysipelas (丹毒)",
     "Causative Agent": "<span style='color:red'>Streptococcus pyogenes</span> (Group A Streptococcus)",
     "Primary Source of Infection": "Skin wounds, Tinea pedis (athlete's foot), upper respiratory tract infections",
@@ -36,6 +40,7 @@
     "Antibiotic Treatment": "Penicillin"
   },
   {
+    "Category": "皮膚感染",
     "Disease": "Erysipeloid (類丹毒)",
     "Causative Agent": "<span style='color:red'>Erysipelothrix rhusiopathiae</span> (Gram-positive pleomorphic rods)",
     "Primary Source of Infection": "Contact with infected fish, swine, or meat (Occupational disease)",
@@ -45,6 +50,7 @@
     "Antibiotic Treatment": "Penicillin / Erythromycin"
   },
   {
+    "Category": "傷寒類疾病",
     "Disease": "Typhus (斑疹傷寒)",
     "Causative Agent": "<span style='color:red'>Rickettsia prowazekii / typhi</span> (Gram-negative Coccobacilli (pleomorphic))",
     "Transmission Route": "Arthropod vectors (Lice, Fleas)",
@@ -53,6 +59,7 @@
     "Prevention": "Vector control (Lice/Flea management)"
   },
   {
+    "Category": "傷寒類疾病",
     "Disease": "Typhoid Fever (傷寒)",
     "Causative Agent": "<span style='color:red'>Salmonella typhi</span> (Gram-negative Rods (bacilli))",
     "Transmission Route": "Fecal-oral route (Contaminated food or water)",
@@ -61,6 +68,7 @@
     "Prevention": "Vaccination and food/water hygiene"
   },
   {
+    "Category": "腸道感染",
     "Disease": "Cholera (霍亂)",
     "Causative Agent": "<span style='color:red'>Vibrio cholerae</span> (Gram-negative, curved rod)",
     "Transmission Route": "Fecal-oral (ingestion of contaminated water/food)",
@@ -70,6 +78,7 @@
     "Prevention": "Sanitation, clean water, vaccination"
   },
   {
+    "Category": "腸道感染",
     "Disease": "Pseudomembranous Colitis (偽膜性結腸炎)",
     "Causative Agent": "<span style='color:red'>Clostridioides difficile</span> (Gram-positive, spore-forming, anaerobic rod)",
     "Transmission Route": "Fecal-oral (ingestion of spores; commonly nosocomial)",
@@ -78,6 +87,7 @@
     "Prevention": "Strict hand hygiene, contact precautions, antibiotic stewardship"
   },
   {
+    "Category": "性傳染病",
     "Disease": "Gonorrhea (淋病)",
     "Causative Agent": "<span style='color:red'>Neisseria gonorrhoeae</span> (Gram-negative diplococci)",
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
@@ -86,6 +96,7 @@
     "Latency": "Absent"
   },
   {
+    "Category": "性傳染病",
     "Disease": "Syphilis (梅毒)",
     "Causative Agent": "<span style='color:red'>Treponema pallidum</span> (Spirochete; thin, helical bacterium)",
     "Transmission Route": "Sexual contact; transplacental (congenital); blood transfusion",
@@ -97,6 +108,7 @@
     "Latency": "Present. Characterized by a \"Latent Stage\" (Early and Late) where the patient is asymptomatic but serologically positive."
   },
   {
+    "Category": "性傳染病",
     "Disease": "Chlamydiosis (披衣菌感染)",
     "Causative Agent": "<span style='color:red'>Chlamydia trachomatis</span> (Gram-negative, obligate intracellular bacterium)",
     "Transmission Route": "Sexual contact (vaginal, oral, anal); perinatal transmission",
