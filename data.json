@@ -54,7 +54,7 @@
     "Disease": "Typhus (斑疹傷寒)",
     "Causative Agent": "<span style='color:red'>Rickettsia prowazekii / typhi (Gram-negative Coccobacilli (pleomorphic))</span>",
     "Transmission Route": "<span style='color:red'>Arthropod vectors (Lice, Fleas)</span>",
-    "Primary Symptoms": "High fever, headache, cough, <span style='color:red'>**generalized rash**</span>",
+    "Primary Symptoms": "High fever, headache, cough,<span style='color:red'>**generalized rash**</span>",
     "Antibiotic Treatment": "<span style='color:red'>Doxycycline / Chloramphenicol</span>",
     "Prevention": "<span style='color:red'>Vector control (Lice/Flea management)</span>"
   },
